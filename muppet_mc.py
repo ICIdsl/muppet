@@ -1,7 +1,8 @@
 import src.model_creator as mcSrc
 import copy
+import torch
 
-class MuppetModelCreator(mcSrc.ModelCreator):   
+class ModelCreator(mcSrc.ModelCreator):   
     
     def setup_model(self, params):
         model = self.read_model(params)
