@@ -11,7 +11,6 @@ import src.inference as inferenceSrc
 import configparser as cp
 
 class Application(appSrc.Application):
-    # test comment 
     def __init__(self, configFile):
         super().__init__(configFile)
     
