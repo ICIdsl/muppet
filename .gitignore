@@ -1,4 +1,6 @@
 *.swp
 *.*.swp
 __pycache__
-
+runs/*
+legacy/*
+logs/*
