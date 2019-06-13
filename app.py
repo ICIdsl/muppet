@@ -14,6 +14,8 @@ import src.inference as inferenceSrc
 
 import configparser as cp
 
+import torch
+
 class Application(appSrc.Application):
     def setup_param_checkpoint(self, configFile):
         config = cp.ConfigParser() 
