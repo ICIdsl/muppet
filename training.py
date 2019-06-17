@@ -84,8 +84,6 @@ class Trainer(trainingSrc.Trainer):
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
             
-            policy.check_stopping_condition(optimiser)
-            
             self.batch_iter(model, criterion, optimiser, train_loader, params, losses, top1, top5)
 
             params.train_loss = losses.avg        
