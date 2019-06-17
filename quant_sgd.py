@@ -50,8 +50,11 @@ class QuantSGD(torch.optim.Optimizer):
                 if p.grad is None:
                     continue
 
+                if params.dataType != 'Float':
+                    p.grad.data, _ = self.quantizer.quantize_inputs(p.grad.data, params.bitWidth)
+                
                 d_p = p.grad.data
-                d_p, _ = self.quantizer.quantize_inputs(d_p, params.bitWidth)
+                
                 if weight_decay != 0:
                     d_p.add_(weight_decay, p.data)
                 if momentum != 0:
@@ -70,7 +73,6 @@ class QuantSGD(torch.optim.Optimizer):
                     p.data.add_(-group['lr'], d_p)
                 else:
                     fp.data.add_(-group['lr'], d_p)
-                    # p.data.add_(-group['lr'], d_p)
                     p.data, _ = self.quantizer.quantize_inputs(fp.data, params.bitWidth)
             
         return loss

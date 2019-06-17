@@ -22,6 +22,7 @@ class Params() :
         self.train_batch = config_file.getint('training_hyperparameters', 'train_batch')
         self.test_batch = config_file.getint('training_hyperparameters', 'test_batch') 
         self.lr = config_file.getfloat('training_hyperparameters', 'learning_rate')
+        self.minLR = config_file.getfloat('training_hyperparameters', 'min_lr')
         self.dropout = config_file.getfloat('training_hyperparameters', 'dropout_ratio')
         self.gamma = config_file.getfloat('training_hyperparameters', 'gamma')
         self.momentum = config_file.getfloat('training_hyperparameters', 'momentum') 
@@ -31,7 +32,7 @@ class Params() :
         self.trainValSplit = config_file.getfloat('training_hyperparameters', 'train_val_split')
         
         self.sub_classes = config_file.get('pruning_hyperparameters', 'sub_classes').split() 
-        
+
         self.manual_seed = config_file.getint('pytorch_parameters', 'manual_seed')
         self.workers = config_file.getint('pytorch_parameters', 'data_loading_workers')
         self.gpu_id = config_file.get('pytorch_parameters', 'gpu_id')
@@ -56,12 +57,23 @@ class Params() :
         self.bestValidLoss = 0.0
 
         # muppet attributes 
+        self.runMuppet = config_file.getboolean('muppet_hyperparameter', 'run_muppet')
         self.bitWidth = config_file.getint('muppet_hyperparameters', 'bit_width')
         self.dataType = config_file.get('muppet_hyperparameters', 'data_type')
         self.roundMeth = config_file.get('muppet_hyperparameters', 'round_meth')
+        self.policyResolution = config_file.getint('muppet_hyperparameters', 'policy_resolution')
+        self.policyPatience = config_file.getint('muppet_hyperparameters', 'policy_patience')
+        self.lowPrecLimit = config_file.getint('muppet_hyperparameters', 'low_prec_limit')
+        self.fp32EpochsPerLR = config_file.getint('muppet_hyperparameters', 'fp32_epochs_per_lr')
+
+        self.meanGD = 0
+        self.maxGD = 0
+        self.gdViolations = 0
+        self.sumOfNorms = {}
+        self.sumOfGrads = {}
         self.quantised = (self.bitWidth != 'Float')
         self.sub_classes = []
-
+        
     def get_state(self) : 
         return self.__dict__
 
