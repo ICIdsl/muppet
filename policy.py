@@ -1,5 +1,6 @@
 import sys
 import math
+import torch
 
 class Policy(object):
     def __init__(self, params):
@@ -20,7 +21,7 @@ class Policy(object):
         layerName = layer[0]
         layerGrad = layer[1].grad.data
         
-        gradNorm = torch.pow(torch.norm(grad,2),2)
+        gradNorm = torch.pow(torch.norm(layerGrad,2),2)
         if layerName in self.params.sumOfNorms:
             self.params.sumOfNorms[layer].add_(gradNorm)
         else:
@@ -37,7 +38,7 @@ class Policy(object):
 
     def calculate_mean_gd(self):
         self.params.meanGD = 0
-        numGd = 0
+        numGD = 0
         for layer in self.params.sumOfGrads:
             self.params.meanGD += (self.params.sumOfNorms[layer] / torch.pow(torch.norm(self.params.sumOfGrads[layer],2),2))
             numGD += 1
@@ -46,7 +47,7 @@ class Policy(object):
         self.params.sumOfGrads = {}
 
     def check_violation(self, epoch): 
-        if ((epoch+1) % self.params.resolution) != 0:
+        if ((epoch+1) % self.params.policyResolution) != 0:
             return False 
 
         self.calculate_mean_gd()
@@ -57,7 +58,7 @@ class Policy(object):
             if (self.params.maxGD / self.params.meanGD) > self.threshold[epoch]:
                 self.params.gdViolations += 1
         
-        if self.params.gdViolations >= self.params.patience:
+        if self.params.gdViolations >= self.params.policyPatience:
             self.params.gdViolations = 0
             return True
         
@@ -100,10 +101,10 @@ class Policy(object):
                 else:
                     return True
            
-           self.fp32Count += 1
-           return False
-       else:
-           return False
+            self.fp32Count += 1
+            return False
+        else:
+            return False
         
 
                 

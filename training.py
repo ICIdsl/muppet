@@ -70,8 +70,6 @@ class Trainer(trainingSrc.Trainer):
             losses.update(loss) 
             top1.update(prec1) 
             top5.update(prec5)
-
-            return
     
     def train_network(self, params, tbx_writer, checkpointer, train_loader, test_loader, valLoader, model, criterion, optimiser, inferer, policy, scaler):
         print('Epoch,\tLR,\tTrain_Loss,\tTrain_Top1,\tTrain_Top5,\tTest_Loss,\tTest_Top1,\tTest_Top5,\tVal_Loss,\tVal_Top1,\tVal_Top5')
@@ -101,5 +99,5 @@ class Trainer(trainingSrc.Trainer):
             policy.update(model)
             if policy.check_violation(epoch):
                 policy.change_precision(scaler, model, optimiser)
-            if policy.check_stopping_condition():
+            if policy.check_stopping_condition(optimiser):
                 return

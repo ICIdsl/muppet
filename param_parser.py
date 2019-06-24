@@ -57,7 +57,7 @@ class Params() :
         self.bestValidLoss = 0.0
 
         # muppet attributes 
-        self.runMuppet = config_file.getboolean('muppet_hyperparameter', 'run_muppet')
+        self.runMuppet = config_file.getboolean('muppet_hyperparameters', 'run_muppet')
         self.bitWidth = config_file.getint('muppet_hyperparameters', 'bit_width')
         self.dataType = config_file.get('muppet_hyperparameters', 'data_type')
         self.roundMeth = config_file.get('muppet_hyperparameters', 'round_meth')
