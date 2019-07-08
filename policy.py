@@ -4,12 +4,6 @@ import torch
 
 class Policy(object):
     def __init__(self, params):
-        # self.meanGD = params.meanGD
-        # self.maxGD = params.maxGD
-        # self.sumOfNorms = params.sumOfNorms
-        # self.sumOfGrads = params.sumOfGrads
-        # self.gdViolations = params.gdViolations
-        # self.resolution = params.policyResolution
         self.params = params
         self.threshold = self._threshold()
         self.fp32Count = 0
@@ -20,17 +14,17 @@ class Policy(object):
     def update_calculation(self, layer):
         layerName = layer[0]
         layerGrad = layer[1].grad.data
-        
+
         gradNorm = torch.pow(torch.norm(layerGrad,2),2)
         if layerName in self.params.sumOfNorms:
-            self.params.sumOfNorms[layer].add_(gradNorm)
+            self.params.sumOfNorms[layerName].add_(gradNorm)
         else:
-            self.params.sumOfNorms[layer] = gradNorm
+            self.params.sumOfNorms[layerName] = gradNorm
 
         if layerName in self.params.sumOfGrads:
-            self.params.sumOfGrads[layer].add_(layerGrad)
+            self.params.sumOfGrads[layerName].add_(layerGrad)
         else:
-            self.params.sumOfGrads[layer] = layerGrad
+            self.params.sumOfGrads[layerName] = layerGrad
 
     def update(self, model):
         for param in model.named_parameters():
@@ -39,14 +33,14 @@ class Policy(object):
     def calculate_mean_gd(self):
         self.params.meanGD = 0
         numGD = 0
-        for layer in self.params.sumOfGrads:
+        for layer, val in self.params.sumOfGrads.items():
             self.params.meanGD += (self.params.sumOfNorms[layer] / torch.pow(torch.norm(self.params.sumOfGrads[layer],2),2))
             numGD += 1
         self.params.meanGD = self.params.meanGD / numGD
         self.params.sumOfNorms = {}
         self.params.sumOfGrads = {}
 
-    def check_violation(self, epoch): 
+    def check_violation(self, epoch, tqdm): 
         if ((epoch+1) % self.params.policyResolution) != 0:
             return False 
 
@@ -57,6 +51,8 @@ class Policy(object):
         else:
             if (self.params.maxGD / self.params.meanGD) > self.threshold[epoch]:
                 self.params.gdViolations += 1
+        
+        tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
         
         if self.params.gdViolations >= self.params.policyPatience:
             self.params.gdViolations = 0

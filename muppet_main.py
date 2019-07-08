@@ -16,7 +16,7 @@ import src.inference as inference
 import src.utils as utils
 from src.checkpointing import Checkpointer
 
-import tensorboardX as tbx
+# import tensorboardX as tbx
 
 import torch
 import torch.cuda
