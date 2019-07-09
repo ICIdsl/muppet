@@ -9,7 +9,6 @@ class Scaler(object):
         self.quantizer = _quantizer
         self.weightsSF = {}
         self.inputSF = 0
-        # self.bitWidth = bitWidth
         self.params = params
 
         self.update_model_precision(model)

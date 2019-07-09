@@ -43,6 +43,7 @@ class Params() :
         self.branch = config_file.getboolean('pytorch_parameters', 'branch')
         self.evaluate = config_file.getboolean('pytorch_parameters', 'evaluate')
         self.tee_printing = config_file.get('pytorch_parameters', 'tee_printing')
+        self.enableTbx = config_file.get('pytorch_parameters', 'enable_tbx')
 
         # attributes used internally
         self.use_cuda = True
@@ -66,13 +67,17 @@ class Params() :
         self.lowPrecLimit = config_file.getint('muppet_hyperparameters', 'low_prec_limit')
         self.fp32EpochsPerLR = config_file.getint('muppet_hyperparameters', 'fp32_epochs_per_lr')
 
-        self.meanGD = 0
+        if self.dataType == "Float":
+            self.bitWidth = -1
+
+        self.meanGD = 1
         self.maxGD = 0
         self.gdViolations = 0
         self.sumOfNorms = {}
         self.sumOfGrads = {}
         self.quantised = (self.bitWidth != 'Float')
         self.sub_classes = []
+        self.threshold = -1
         
     def get_state(self) : 
         return self.__dict__

@@ -8,8 +8,9 @@ import src.muppet.training as trainingSrc
 import src.muppet.quantize as quantizeSrc
 import src.muppet.quant_layers as quantLayersSrc
 import src.muppet.policy as policySrc
+import src.muppet.checkpointing as checkpointingSrc
 
-import src.checkpointing as checkpointingSrc
+# import src.checkpointing as checkpointingSrc
 import src.input_preprocessor as preprocSrc
 import src.inference as inferenceSrc
 
@@ -30,14 +31,12 @@ class Application(appSrc.Application):
         self.mc = mcSrc.ModelCreator()
         self.trainer = trainingSrc.Trainer()
         self.inferer = inferenceSrc.Inferer()
-        self.quantizer = quantizeSrc.Quantizer()
+        self.quantizer = quantizeSrc.Quantizer(self.params.roundMeth)
         self.policy = policySrc.Policy(self.params) 
 
     def setup_model(self):
         print('==> Setting up quantized Model')
-        # self._model, self._modelQuant, self.criterion, self.optimiser = self.mc.setup_model(self.params)
         self.model, self.criterion, self.optimiser = self.mc.setup_model(self.params, self.quantizer)
-        # self.scaler = scaleSrc.Scaler(self.model, self.quantizer, self.params.bitWidth)
         self.scaler = scaleSrc.Scaler(self.model, self.quantizer, self.params)
         self.scaler.register_hooks()
         self.sfHolder = quantLayersSrc.SFHolder()

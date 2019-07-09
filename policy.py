@@ -40,7 +40,7 @@ class Policy(object):
         self.params.sumOfNorms = {}
         self.params.sumOfGrads = {}
 
-    def check_violation(self, epoch, tqdm): 
+    def check_violation(self, epoch, tqdm, cp): 
         if ((epoch+1) % self.params.policyResolution) != 0:
             return False 
 
@@ -52,8 +52,10 @@ class Policy(object):
             if (self.params.maxGD / self.params.meanGD) > self.threshold[epoch]:
                 self.params.gdViolations += 1
         
-        tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
+        self.params.threshold = self.threshold[epoch]
         
+        tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
+
         if self.params.gdViolations >= self.params.policyPatience:
             self.params.gdViolations = 0
             return True

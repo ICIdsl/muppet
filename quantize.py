@@ -5,6 +5,9 @@ import math
 import random as rand
 
 class Quantizer(object):
+    def __init__(self, roundMeth):
+        self.roundMeth = roundMeth
+
     def quantize_inputs(self, inputs, bitWidth):
         if isinstance(inputs, torch.Tensor): 
             tmp = inputs.clone()
@@ -29,8 +32,12 @@ class Quantizer(object):
         if (torch.max(scaled).item() == float("inf") or torch.min(scaled).item() == float("-inf") or 0):
             raise ValueError
 
-        # scaled, sf = self.simpleRound(scaled, maxVal, minVal)
-        scaled, sf = self.stochRound(scaled, maxVal, minVal)
+        if self.roundMeth == 'Simple': 
+            scaled, sf = self.simpleRound(scaled, maxVal, minVal)
+        elif self.roundMeth == 'Stochastic':
+            scaled, sf = self.stochRound(scaled, maxVal, minVal)
+        else:
+            raise ValueError("Rounding method should be one of 'Simple' or 'Stochastic'")
 
         return scaled, sf
 

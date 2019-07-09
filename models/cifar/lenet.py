@@ -18,9 +18,9 @@ class LeNet(nn.Module):
         self.conv2 = QuantConv2d(6, 16, kernel_size=5)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool2d = nn.MaxPool2d(kernel_size=2)
-        self.fc1 = QuantLinear(16*5*5, 120)
-        self.fc2 = QuantLinear(120, 84)
-        self.fc3 = QuantLinear(84, num_classes)
+        self.classifier1 = QuantLinear(16*5*5, 120)
+        self.classifier2 = QuantLinear(120, 84)
+        self.classifier3 = QuantLinear(84, num_classes)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -30,11 +30,11 @@ class LeNet(nn.Module):
         x = self.relu(x)
         x = self.maxpool2d(x)
         x = x.view(x.size(0), -1)
-        x = self.fc1(x)
+        x = self.classifier1(x)
         x = self.relu(x)
-        x = self.fc2(x)
+        x = self.classifier2(x)
         x = self.relu(x)
-        x = self.fc3(x)        
+        x = self.classifier3(x)        
         return x
 
 def lenet(**kwargs):
