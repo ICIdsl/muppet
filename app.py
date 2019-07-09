@@ -29,9 +29,9 @@ class Application(appSrc.Application):
     def setup_others(self):
         self.preproc = preprocSrc.Preproc()
         self.mc = mcSrc.ModelCreator()
-        self.trainer = trainingSrc.Trainer()
-        self.inferer = inferenceSrc.Inferer()
         self.quantizer = quantizeSrc.Quantizer(self.params.roundMeth)
+        self.trainer = trainingSrc.Trainer(self.quantizer)
+        self.inferer = inferenceSrc.Inferer()
         self.policy = policySrc.Policy(self.params) 
 
     def setup_model(self):
@@ -46,6 +46,7 @@ class Application(appSrc.Application):
 
         for k,v in layers.items():
             if 'conv' in k or 'classifier' in k:
+                v.setup_quantizer(self.quantizer)
                 v.prevLayer = prevLayer
                 v.sfHolder = self.sfHolder
                 prevLayer = str(v)

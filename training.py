@@ -9,8 +9,8 @@ import src.training as trainingSrc
 import src.muppet.quantize as quantizerSrc
 
 class Trainer(trainingSrc.Trainer):
-    def __init__(self):
-        self.quantizer = quantizerSrc.Quantizer()
+    def __init__(self, quantizer):
+        self.quantizer = quantizer 
     
     def update_lr(self, params, optimiser) : 
         if params.runMuppet:

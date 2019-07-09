@@ -12,7 +12,6 @@ class ModelCreator(mcSrc.ModelCreator):
         model = self.load_pretrained(params, model)
         criterion = self.setup_criterion()
         optimiser = self.setup_optimiser(params, model, quantizer)
-        # optimiser = self.setup_optimiser(params, model)
     
         return (model, criterion, optimiser)
 
@@ -26,7 +25,6 @@ class ModelCreator(mcSrc.ModelCreator):
         model = model.cuda()
         
         return model
-
 
     def read_model(self, params):
         if params.dataset == 'cifar10' : 

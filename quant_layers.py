@@ -9,11 +9,14 @@ class QuantConv2d(nn.Conv2d):
 
         self.bitWidth = _bitWidth
         self.sfHolder = _SFHolder
-        self.quantizer = quantize.Quantizer()
+        # self.quantizer = quantize.Quantizer()
         self.prevLayer = None
         self.weightSF = 0
 
         super(QuantConv2d, self).__init__(in_channels, out_channels, kernel_size, stride, padding, dilation, groups, bias)
+
+    def setup_quantizer(self, quantizer):
+        self.quantizer = quantizer
 
     def forward(self, input):
         result = super().forward(input)
@@ -24,11 +27,14 @@ class QuantLinear(nn.Linear):
 
         self.bitWidth = _bitWidth
         self.sfHolder = _SFHolder
-        self.quantizer = quantize.Quantizer()
+        # self.quantizer = quantize.Quantizer()
         self.prevLayer = None
         self.weightSF = 0
 
         super(QuantLinear, self).__init__(in_features, out_features, bias)
+    
+    def setup_quantizer(self, quantizer):
+        self.quantizer = quantizer
 
     def forward(self, input):
         result = super().forward(input)
