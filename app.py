@@ -45,7 +45,7 @@ class Application(appSrc.Application):
         prevLayer = ''
 
         for k,v in layers.items():
-            if 'conv' in k or 'classifier' in k:
+            if 'Conv' in str(v) or 'Linear' in str(v):
                 v.setup_quantizer(self.quantizer)
                 v.prevLayer = prevLayer
                 v.sfHolder = self.sfHolder
