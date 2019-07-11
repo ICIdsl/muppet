@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import argparse
 import configparser as cp
+import sys
 
 import src.param_parser as ppSrc
 
@@ -17,8 +18,15 @@ class Params(ppSrc.Params):
         self.roundMeth = config_file.get('muppet_hyperparameters', 'round_meth')
         self.policyResolution = config_file.getint('muppet_hyperparameters', 'policy_resolution')
         self.policyPatience = config_file.getint('muppet_hyperparameters', 'policy_patience')
-        self.lowPrecLimit = config_file.getint('muppet_hyperparameters', 'low_prec_limit')
         self.fp32EpochsPerLR = config_file.getint('muppet_hyperparameters', 'fp32_epochs_per_lr')
+        
+        self.precSchedule = config_file.get('muppet_hyperparameters', 'prec_schedule', fallback='undefined')
+        if self.runMuppet:
+            if self.precSchedule == 'undefined' or self.precSchedule == '':
+                raise ValueError('Precision Schedule not defined')
+            else:
+                self.precSchedule = [int(x) for x in self.precSchedule.split()]
+                assert self.precSchedule[0] == self.bitWidth, 'specified bitwidth ({}) and initial precision ({}) in prec schedule should match'.format(self.bitWidth, self.precSchedule[0])
 
         if self.dataType == "Float":
             self.bitWidth = -1

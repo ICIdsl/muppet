@@ -9,7 +9,6 @@ class QuantConv2d(nn.Conv2d):
 
         self.bitWidth = _bitWidth
         self.sfHolder = _SFHolder
-        # self.quantizer = quantize.Quantizer()
         self.prevLayer = None
         self.weightSF = 0
 
@@ -27,11 +26,27 @@ class QuantLinear(nn.Linear):
 
         self.bitWidth = _bitWidth
         self.sfHolder = _SFHolder
-        # self.quantizer = quantize.Quantizer()
         self.prevLayer = None
         self.weightSF = 0
 
         super(QuantLinear, self).__init__(in_features, out_features, bias)
+    
+    def setup_quantizer(self, quantizer):
+        self.quantizer = quantizer
+
+    def forward(self, input):
+        result = super().forward(input)
+        return forward(self, result)
+
+class QuantAvgPool2d(nn.AvgPool2d):
+    def __init__(self, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, _bitWidth=8, _SFHolder=None):
+
+        self.bitWidth = _bitWidth
+        self.sfHolder = _SFHolder
+        self.prevLayer = None
+        self.weightSF = 0
+
+        super(QuantAvgPool2d, self).__init__(kernel_size, stride, padding, ceil_mode, count_include_pad)
     
     def setup_quantizer(self, quantizer):
         self.quantizer = quantizer

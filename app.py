@@ -40,17 +40,7 @@ class Application(appSrc.Application):
         self.scaler = scaleSrc.Scaler(self.model, self.quantizer, self.params)
         self.scaler.register_hooks()
         self.sfHolder = quantLayersSrc.SFHolder()
-        modules = self.model._modules
-        layers = modules['module']._modules
-        prevLayer = ''
-
-        for k,v in layers.items():
-            if 'Conv' in str(v) or 'Linear' in str(v):
-                v.setup_quantizer(self.quantizer)
-                v.prevLayer = prevLayer
-                v.sfHolder = self.sfHolder
-                prevLayer = str(v)
-            
+        
     def run_training(self):
         # train model 
         print('==> Performing Training')

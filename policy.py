@@ -7,6 +7,7 @@ class Policy(object):
         self.params = params
         self.threshold = self._threshold()
         self.fp32Count = 0
+        self.precIndex = 0
 
     def _threshold(self):
         return [1 + 1.5*math.exp(-0.1*x) for x in range(self.params.epochs)]
@@ -41,7 +42,7 @@ class Policy(object):
         self.params.sumOfGrads = {}
 
     def check_violation(self, epoch, tqdm, cp): 
-        if ((epoch+1) % self.params.policyResolution) != 0:
+        if ((epoch+1) % self.params.policyResolution) != 0 or self.params.dataType == 'Float':
             return False 
 
         self.calculate_mean_gd()
@@ -70,25 +71,16 @@ class Policy(object):
                 weights[i].data = fpWeights[i].data
         
     def change_precision(self, scaler, model, optimiser):
-        if (self.params.bitWidth < self.params.lowPrecLimit) and self.params.dataType != 'Float':
-            # change bitWidth in params which ensures, 
-            # weights, inputs, and gradients get quantised correctly
-            self.params.bitWidth += 2
-            self.params.maxGD = 0
+        self.precIndex += 1 
+        self.params.bitWidth = self.params.precSchedule[self.precIndex]
+        self.params.maxGD = 0
 
-            # call scaler's update_model_precision to ensure
-            # layer outputs are quantised correctly
-            scaler.update_model_precision(model)
-        else:
-            self.params.bitWidth = -1
+        if self.params.bitWidth == -1:
             self.params.dataType = 'Float'
-            self.params.maxGD = 0
-            
-            scaler.update_model_precision(model)
-            
-            if self.fp32Count == 0: 
-                self.copy_fp32_model(optimiser)
-    
+            self.copy_fp32_model(optimiser)
+
+        scaler.update_model_precision(model)
+
     def check_stopping_condition(self, optimiser):
         if self.params.dataType == 'Float':
             if (self.fp32Count+1) % self.params.fp32EpochsPerLR == 0:

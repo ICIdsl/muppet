@@ -10,19 +10,28 @@ class Scaler(object):
         self.weightsSF = {}
         self.inputSF = 0
         self.params = params
+        
+        # setup quantiser
+        prevLayer = ''
+        for k,v in self.layers.items():
+            if 'Quant' in str(v):
+                v.setup_quantizer(self.quantizer)
+                v.prevLayer = prevLayer
+                v.sfHolder = None
+                prevLayer = str(v)
 
         self.update_model_precision(model)
     
     def update_model_precision(self, model):
         layers = model._modules['module']._modules
         for k,v in layers.items():
-            if 'conv' in k or 'classifier' in k:
+            if 'Quant' in str(v):
                 v.bitWidth = self.params.bitWidth
 
     def register_hooks(self):
         for k,v in self.layers.items():
-            if 'conv' in k or 'relu' in k or 'classifier' in k:
-                v.register_backward_hook(self.backward_quantize_hook)
+            if 'Quant' in str(v):
+              v.register_backward_hook(self.backward_quantize_hook)
 
     def backward_quantize_hook(self, module, grad_input, grad_output):
         if self.params.dataType != 'Float':

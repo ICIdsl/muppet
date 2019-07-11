@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from src.muppet.quant_layers import QuantConv2d, QuantLinear, QuantAvgPool2d
+
 __all__ = ['googlenet']
 
 class GoogLeNet(nn.Module):
@@ -10,7 +12,7 @@ class GoogLeNet(nn.Module):
         super(GoogLeNet, self).__init__()
         
         # pre_layers
-        self.conv0 = nn.Conv2d(3, 192, kernel_size=3, padding=1)
+        self.conv0 = QuantConv2d(3, 192, kernel_size=3, padding=1)
         self.bn0 = nn.BatchNorm2d(192) 
         self.relu0 = nn.ReLU(True)
         
@@ -23,28 +25,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 32
         pool_planes = 32
         
-        self.a3_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.a3_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.a3_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.a3_b1_relu0 = nn.ReLU(True)
 
-        self.a3_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.a3_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.a3_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.a3_b2_relu0 = nn.ReLU(True)
-        self.a3_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.a3_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.a3_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.a3_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.a3_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.a3_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.a3_b3_relu0 = nn.ReLU(True)
-        self.a3_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.a3_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.a3_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.a3_b3_relu1 = nn.ReLU(True)
-        self.a3_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.a3_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.a3_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.a3_b3_relu2 = nn.ReLU(True)
             
         self.a3_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.a3_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.a3_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.a3_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.a3_b4_relu0 = nn.ReLU(True)
 
@@ -57,28 +59,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 96
         pool_planes = 64
         
-        self.b3_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.b3_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.b3_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.b3_b1_relu0 = nn.ReLU(True)
 
-        self.b3_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.b3_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.b3_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.b3_b2_relu0 = nn.ReLU(True)
-        self.b3_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.b3_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.b3_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.b3_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.b3_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.b3_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.b3_b3_relu0 = nn.ReLU(True)
-        self.b3_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.b3_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.b3_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.b3_b3_relu1 = nn.ReLU(True)
-        self.b3_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.b3_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.b3_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.b3_b3_relu2 = nn.ReLU(True)
             
         self.b3_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.b3_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.b3_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.b3_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.b3_b4_relu0 = nn.ReLU(True)
 
@@ -93,28 +95,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 48
         pool_planes = 64
         
-        self.a4_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.a4_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.a4_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.a4_b1_relu0 = nn.ReLU(True)
 
-        self.a4_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.a4_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.a4_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.a4_b2_relu0 = nn.ReLU(True)
-        self.a4_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.a4_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.a4_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.a4_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.a4_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.a4_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.a4_b3_relu0 = nn.ReLU(True)
-        self.a4_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.a4_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.a4_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.a4_b3_relu1 = nn.ReLU(True)
-        self.a4_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.a4_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.a4_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.a4_b3_relu2 = nn.ReLU(True)
             
         self.a4_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.a4_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.a4_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.a4_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.a4_b4_relu0 = nn.ReLU(True)
         
@@ -127,28 +129,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 64
         pool_planes = 64
         
-        self.b4_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.b4_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.b4_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.b4_b1_relu0 = nn.ReLU(True)
 
-        self.b4_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.b4_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.b4_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.b4_b2_relu0 = nn.ReLU(True)
-        self.b4_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.b4_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.b4_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.b4_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.b4_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.b4_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.b4_b3_relu0 = nn.ReLU(True)
-        self.b4_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.b4_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.b4_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.b4_b3_relu1 = nn.ReLU(True)
-        self.b4_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.b4_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.b4_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.b4_b3_relu2 = nn.ReLU(True)
             
         self.b4_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.b4_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.b4_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.b4_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.b4_b4_relu0 = nn.ReLU(True)
 
@@ -161,28 +163,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 64
         pool_planes = 64
         
-        self.c4_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.c4_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.c4_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.c4_b1_relu0 = nn.ReLU(True)
 
-        self.c4_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.c4_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.c4_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.c4_b2_relu0 = nn.ReLU(True)
-        self.c4_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.c4_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.c4_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.c4_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.c4_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.c4_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.c4_b3_relu0 = nn.ReLU(True)
-        self.c4_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.c4_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.c4_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.c4_b3_relu1 = nn.ReLU(True)
-        self.c4_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.c4_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.c4_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.c4_b3_relu2 = nn.ReLU(True)
             
         self.c4_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.c4_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.c4_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.c4_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.c4_b4_relu0 = nn.ReLU(True)
 
@@ -195,28 +197,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 64
         pool_planes = 64
         
-        self.d4_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.d4_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.d4_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.d4_b1_relu0 = nn.ReLU(True)
 
-        self.d4_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.d4_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.d4_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.d4_b2_relu0 = nn.ReLU(True)
-        self.d4_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.d4_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.d4_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.d4_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.d4_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.d4_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.d4_b3_relu0 = nn.ReLU(True)
-        self.d4_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.d4_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.d4_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.d4_b3_relu1 = nn.ReLU(True)
-        self.d4_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.d4_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.d4_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.d4_b3_relu2 = nn.ReLU(True)
             
         self.d4_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.d4_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.d4_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.d4_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.d4_b4_relu0 = nn.ReLU(True)
         
@@ -229,28 +231,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 128
         pool_planes = 128
         
-        self.e4_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.e4_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.e4_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.e4_b1_relu0 = nn.ReLU(True)
 
-        self.e4_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.e4_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.e4_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.e4_b2_relu0 = nn.ReLU(True)
-        self.e4_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.e4_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.e4_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.e4_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.e4_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.e4_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.e4_b3_relu0 = nn.ReLU(True)
-        self.e4_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.e4_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.e4_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.e4_b3_relu1 = nn.ReLU(True)
-        self.e4_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.e4_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.e4_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.e4_b3_relu2 = nn.ReLU(True)
             
         self.e4_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.e4_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.e4_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.e4_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.e4_b4_relu0 = nn.ReLU(True)
         
@@ -263,28 +265,28 @@ class GoogLeNet(nn.Module):
         n5x5 = 128
         pool_planes = 128
         
-        self.a5_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.a5_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.a5_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.a5_b1_relu0 = nn.ReLU(True)
 
-        self.a5_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.a5_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.a5_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.a5_b2_relu0 = nn.ReLU(True)
-        self.a5_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.a5_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.a5_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.a5_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.a5_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.a5_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.a5_b3_relu0 = nn.ReLU(True)
-        self.a5_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.a5_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.a5_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.a5_b3_relu1 = nn.ReLU(True)
-        self.a5_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.a5_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.a5_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.a5_b3_relu2 = nn.ReLU(True)
             
         self.a5_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.a5_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.a5_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.a5_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.a5_b4_relu0 = nn.ReLU(True)
         
@@ -297,33 +299,33 @@ class GoogLeNet(nn.Module):
         n5x5 = 128
         pool_planes = 128
         
-        self.b5_b1_conv0 = nn.Conv2d(in_planes, n1x1, kernel_size=1)  
+        self.b5_b1_conv0 = QuantConv2d(in_planes, n1x1, kernel_size=1)  
         self.b5_b1_bn0 = nn.BatchNorm2d(n1x1)
         self.b5_b1_relu0 = nn.ReLU(True)
 
-        self.b5_b2_conv0 = nn.Conv2d(in_planes, n3x3red, kernel_size=1)
+        self.b5_b2_conv0 = QuantConv2d(in_planes, n3x3red, kernel_size=1)
         self.b5_b2_bn0 = nn.BatchNorm2d(n3x3red) 
         self.b5_b2_relu0 = nn.ReLU(True)
-        self.b5_b2_conv1 = nn.Conv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
+        self.b5_b2_conv1 = QuantConv2d(n3x3red, n3x3, kernel_size=3, padding=1) 
         self.b5_b2_bn1 = nn.BatchNorm2d(n3x3) 
             
-        self.b5_b3_conv0 = nn.Conv2d(in_planes, n5x5red, kernel_size=1)
+        self.b5_b3_conv0 = QuantConv2d(in_planes, n5x5red, kernel_size=1)
         self.b5_b3_bn0 = nn.BatchNorm2d(n5x5red)
         self.b5_b3_relu0 = nn.ReLU(True)
-        self.b5_b3_conv1 = nn.Conv2d(n5x5red, n5x5, kernel_size=3, padding=1)
+        self.b5_b3_conv1 = QuantConv2d(n5x5red, n5x5, kernel_size=3, padding=1)
         self.b5_b3_bn1 = nn.BatchNorm2d(n5x5)
         self.b5_b3_relu1 = nn.ReLU(True)
-        self.b5_b3_conv2 = nn.Conv2d(n5x5, n5x5, kernel_size=3, padding=1)
+        self.b5_b3_conv2 = QuantConv2d(n5x5, n5x5, kernel_size=3, padding=1)
         self.b5_b3_bn2 = nn.BatchNorm2d(n5x5)
         self.b5_b3_relu2 = nn.ReLU(True)
             
         self.b5_b4_maxpool0 = nn.MaxPool2d(3, stride=1, padding=1)
-        self.b5_b4_conv0 = nn.Conv2d(in_planes, pool_planes, kernel_size=1)
+        self.b5_b4_conv0 = QuantConv2d(in_planes, pool_planes, kernel_size=1)
         self.b5_b4_bn0 = nn.BatchNorm2d(pool_planes)
         self.b5_b4_relu0 = nn.ReLU(True)
         
-        self.avgpool = nn.AvgPool2d(8, stride=1)
-        self.linear = nn.Linear(1024, 10)
+        self.avgpool = QuantAvgPool2d(8, stride=1)
+        self.linear = QuantLinear(1024, 10)
 
     def forward(self, x):
         # pre_layers
