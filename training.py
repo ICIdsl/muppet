@@ -41,8 +41,7 @@ class Trainer(trainingSrc.Trainer):
         
         outputs = model(inputs) 
         loss = criterion(outputs, targets)
-        # loss.data, _ = self.quantizer.quantize_inputs(loss.data, params.bitWidth)
-    
+
         prec1, prec5 = utils.accuracy(outputs.data, targets.data) 
     
         model.zero_grad() 
