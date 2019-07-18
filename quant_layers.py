@@ -55,6 +55,23 @@ class QuantAvgPool2d(nn.AvgPool2d):
         result = super().forward(input)
         return forward(self, result)
 
+class QuantAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
+    def __init__(self, output_size, _bitWidth=8, _SFHolder=None):
+
+        self.bitWidth = _bitWidth
+        self.sfHolder = _SFHolder
+        self.prevLayer = None
+        self.weightSF = 0
+
+        super(QuantAdaptiveAvgPool2d, self).__init__(output_size)
+    
+    def setup_quantizer(self, quantizer):
+        self.quantizer = quantizer
+
+    def forward(self, input):
+        result = super().forward(input)
+        return forward(self, result)
+
 def forward(self, result):
     if self.bitWidth != -1:
         result.data, sf = self.quantizer.quantize_inputs(result.data, self.bitWidth)

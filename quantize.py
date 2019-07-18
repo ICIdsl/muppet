@@ -54,7 +54,7 @@ class Quantizer(object):
         scaled, sf = self.findSfAndScale(scaled, maxVal, minVal)
 
         # add values in rand -0.5 -> 0.5 to potentially tip rounding in a certain direction
-        mod = torch.FloatTensor(scaled.size()).cuda()
+        mod = torch.FloatTensor(scaled.size()).cuda(scaled.device)
         mod.uniform_(-0.5, 0.5)
         scaled.add_(mod)
 

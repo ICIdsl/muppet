@@ -5,6 +5,9 @@ import src.model_creator as mcSrc
 import copy
 import torch
 
+import sys
+import os
+
 class ModelCreator(mcSrc.ModelCreator):   
     def setup_model(self, params, quantizer):
         model = self.read_model(params)
@@ -20,10 +23,10 @@ class ModelCreator(mcSrc.ModelCreator):
 
     def transfer_to_gpu(self, params, model):
         gpu_list = [int(x) for x in params.gpu_id.split(',')]
-        
-        model = torch.nn.DataParallel(model, gpu_list)
-        model = model.cuda()
-        
+
+        model = torch.nn.DataParallel(model, device_ids=gpu_list)
+        model.to(gpu_list[0])
+
         return model
 
     def read_model(self, params):
