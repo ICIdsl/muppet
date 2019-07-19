@@ -2,31 +2,33 @@ import src.muppet.models as models
 import src.muppet.quant_sgd as qsgd
 
 import src.model_creator as mcSrc
-import copy
-import torch
 
+import copy
 import sys
 import os
+
+import torch
 
 class ModelCreator(mcSrc.ModelCreator):   
     def setup_model(self, params, quantizer):
         model = self.read_model(params)
         model = self.transfer_to_gpu(params, model)
         model = self.load_pretrained(params, model)
-        criterion = self.setup_criterion()
+        criterion = self.setup_criterion(params)
         optimiser = self.setup_optimiser(params, model, quantizer)
     
         return (model, criterion, optimiser)
+    
+    def setup_criterion(self, params):
+        return torch.nn.CrossEntropyLoss()
 
     def setup_optimiser(self, params, model, quantizer):
         return qsgd.QuantSGD(model.parameters(), quantizer, lr=params.lr, momentum=params.momentum, weight_decay=params.weight_decay)
 
     def transfer_to_gpu(self, params, model):
-        gpu_list = [int(x) for x in params.gpu_id.split(',')]
-
-        model = torch.nn.DataParallel(model, device_ids=gpu_list)
-        model.to(gpu_list[0])
-
+        model = torch.nn.DataParallel(model, device_ids=params.gpuList)
+        device = 'cuda:' + str(params.gpuList[0])
+        model.cuda(device)
         return model
 
     def read_model(self, params):

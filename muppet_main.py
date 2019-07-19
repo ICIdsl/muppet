@@ -20,6 +20,7 @@ from src.checkpointing import Checkpointer
 
 import torch
 import torch.cuda
+import torch.multiprocessing as mp
 
 import argparse
 
@@ -45,5 +46,5 @@ def main() :
 
     app.main()
 
-        
-main()
+if __name__ == '__main__': 
+    main()

@@ -38,33 +38,33 @@ class Trainer(trainingSrc.Trainer):
         return params
 
     def train(self, model, criterion, optimiser, inputs, targets, params): 
-        model.train()
 
-        outputs = model(inputs) 
+        outputs = model(inputs)
         loss = criterion(outputs, targets)
 
         prec1, prec5 = utils.accuracy(outputs.data, targets.data) 
-    
+
         model.zero_grad() 
         loss.backward() 
-        
+
         optimiser.step(params)
 
-        return (loss, prec1, prec5)
+        return (loss.item(), prec1.item(), prec5.item())
 
     def batch_iter(self, model, criterion, optimiser, train_loader, params, losses, top1, top5):
+        model.train()
+        
         for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
+            
             # move inputs and targets to GPU
-            device = int(params.gpu_id.split(',')[0])
+            device = 'cuda:'+str(params.gpuList[0])
             if params.use_cuda: 
-                inputs, targets = inputs.to(device), targets.to(device)
+                inputs, targets = inputs.cuda(device, non_blocking=True), targets.cuda(device, non_blocking=True)
             
             if params.dataType != 'Float':
                 for i in range(len(inputs)):
                     inputs[i], _ = self.quantizer.quantize_inputs(inputs[i].data, params.bitWidth)
             
-            inputs, targets = torch.autograd.Variable(inputs), torch.autograd.Variable(targets)
-        
             # train model
             loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets, params)
             
