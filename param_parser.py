@@ -40,7 +40,7 @@ class Params(ppSrc.Params):
         self.sub_classes = []
         self.threshold = -1
 
-        self.gpuList = [int(x) for x in self.gpu_id.split(',')]
+        # self.gpuList = [int(x) for x in self.gpu_id.split(',')]
         
 def parse_command_line_args() : 
     parser = argparse.ArgumentParser(description='PyTorch Pruning')
