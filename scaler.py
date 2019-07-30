@@ -95,6 +95,8 @@ class UniversalIterator(object):
             self.quantLayers.append(v)
         elif name == 'QuantAdaptiveAvgPool2d':
             self.quantLayers.append(v)
+        elif name == 'QuantAvgPool2d':
+            self.quantLayers.append(v)
         else :
             for k,v in v._modules.items():
                 if 'Quant' in str(v):
@@ -109,7 +111,7 @@ class Scaler(object):
         self.weightsSF = {}
         self.inputSF = 0
         self.params = params
-        
+
         # self.quantIterator = eval(params.arch.capitalize() + 'Iterator')
         self.quantIterator = UniversalIterator
         

@@ -23,5 +23,4 @@ class Checkpointer(cpSrc.Checkpointer):
             
             self.values += [meanGD, maxGD, ratio, params.threshold, params.gdViolations]
 
-
     
