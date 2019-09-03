@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 from src.muppet.quant_layers import QuantConv2d, QuantLinear, QuantAdaptiveAvgPool2d
 
-__all__ = ['googlenet']
+__all__ = ['googlenet_quant']
 
 class Inception(nn.Module): 
     def __init__(self, in_channels, ch1x1, ch3x3red, ch3x3, ch5x5red, ch5x5, pool_proj):
@@ -44,12 +44,14 @@ class InceptionAux(nn.Module):
         super(InceptionAux, self).__init__()
         self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
 
-        self.fc1 = nn.Linear(2048, 1024)
-        self.fc2 = nn.Linear(1024, num_classes)
+        self.fc1 = QuantLinear(2048, 1024)
+        self.fc2 = QuantLinear(1024, num_classes)
+        self.avgPool = QuantAdaptiveAvgPool2d((4,4))
 
     def forward(self, x):
         # aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14
-        x = F.adaptive_avg_pool2d(x, (4, 4))
+        # x = F.adaptive_avg_pool2d(x, (4, 4))
+        x = self.avgPool(x)
         # aux1: N x 512 x 4 x 4, aux2: N x 528 x 4 x 4
         x = self.conv(x)
         # N x 128 x 4 x 4
@@ -68,7 +70,7 @@ class BasicConv2d(nn.Module):
 
     def __init__(self, in_channels, out_channels, **kwargs):
         super(BasicConv2d, self).__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, bias=False, **kwargs)
+        self.conv = QuantConv2d(in_channels, out_channels, bias=False, **kwargs)
         self.bn = nn.BatchNorm2d(out_channels, eps=0.001)
 
     def forward(self, x):
@@ -111,7 +113,7 @@ class GoogleNet(nn.Module):
         
         self.dropout = nn.Dropout(0.2)
         
-        self.fc = nn.Linear(1024, num_classes)
+        self.fc = QuantLinear(1024, num_classes)
 
     def forward(self, x):
         if self.transform_input:
@@ -169,9 +171,10 @@ class GoogleNet(nn.Module):
         x = self.fc(x)
         # N x 1000 (num_classes)
         if self.training and self.aux_logits:
-            return _GoogLeNetOutputs(x, aux2, aux1)
+            # return _GoogLeNetOutputs(x, aux2, aux1)
+            return (x, aux2, aux1)
         return x
  
-def googlenet(pretrained=False, **kwargs):
+def googlenet_quant(pretrained=False, **kwargs):
     model = GoogleNet(**kwargs)
     return model

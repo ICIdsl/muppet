@@ -23,7 +23,19 @@ class ModelCreator(mcSrc.ModelCreator):
         return torch.nn.CrossEntropyLoss()
 
     def setup_optimiser(self, params, model, quantizer):
-        return qsgd.QuantSGD(model.parameters(), quantizer, lr=params.lr, momentum=params.momentum, weight_decay=params.weight_decay)
+        opt = qsgd.QuantSGD(model.parameters(), quantizer, lr=params.lr, momentum=params.momentum, weight_decay=params.weight_decay)
+
+        if params.resume == True or params.branch == True or params.evaluate == True:
+            path = params.pretrained.split('/')
+            epoch = path[-1].split('-')
+            masterCopy = '-'.join([epoch[0], 'fpMasterCopy.pth.tar'])
+            masterCopyPath = os.path.join('/'.join(path[:-1]), masterCopy)
+
+            if os.path.exists(masterCopyPath):
+                fp32Weights = torch.load(masterCopyPath)
+                opt.param_groups[0]['fpWeights'] = fp32Weights
+            
+        return opt
 
     def transfer_to_gpu(self, params, model):
         model = torch.nn.DataParallel(model, device_ids=params.gpuList)
@@ -47,10 +59,19 @@ class ModelCreator(mcSrc.ModelCreator):
         print("Creating Quantized Model %s" % params.arch)
         
         if params.arch.endswith('resnet'):
-            model = models.__dict__[params.arch](
-                        num_classes=num_classes,
-                        depth=params.depth
-                    )
+            if 'cifar' in params.dataset:
+                model = models.__dict__[params.arch](
+                            num_classes=num_classes,
+                            depth=params.depth
+                        )
+            else:
+                if params.depth == 18:
+                    model = models.__dict__['resnet18'](pretrained=False, progress=False)
+        elif 'googlenet' in params.arch:
+            if params.evaluate == False:
+                model = models.__dict__[params.arch](num_classes=num_classes, aux_logits=True)
+            else:
+                model = models.__dict__[params.arch](num_classes=num_classes)
         else:
             model = models.__dict__[params.arch](num_classes=num_classes)
 

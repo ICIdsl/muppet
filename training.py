@@ -40,9 +40,24 @@ class Trainer(trainingSrc.Trainer):
     def train(self, model, criterion, optimiser, inputs, targets, params): 
 
         outputs = model(inputs)
-        loss = criterion(outputs, targets)
-
-        prec1, prec5 = utils.accuracy(outputs.data, targets.data) 
+        
+        if 'googlenet' in params.arch:
+            if params.evaluate == False:
+                finalOp = outputs[0]
+                auxOp2 = outputs[1]
+                auxOp1 = outputs[2]
+                loss1 = criterion(finalOp, targets)
+                loss2 = criterion(auxOp2, targets)
+                loss3 = criterion(auxOp1, targets)
+                loss = loss1 + 0.3*loss2 + 0.3*loss3
+                prec1, prec5 = utils.accuracy(finalOp.data, targets.data) 
+        
+            else:
+                loss = criterion(outputs, targets)
+                prec1, prec5 = utils.accuracy(outputs.data, targets.data) 
+        else:
+            loss = criterion(outputs, targets)
+            prec1, prec5 = utils.accuracy(outputs.data, targets.data) 
 
         model.zero_grad() 
         loss.backward() 
