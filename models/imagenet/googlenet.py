@@ -169,7 +169,7 @@ class GoogleNet(nn.Module):
         x = self.fc(x)
         # N x 1000 (num_classes)
         if self.training and self.aux_logits:
-            return _GoogLeNetOutputs(x, aux2, aux1)
+            return (x, aux2, aux1)
         return x
  
 def googlenet(pretrained=False, **kwargs):
