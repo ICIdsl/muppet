@@ -42,7 +42,7 @@ class Trainer(trainingSrc.Trainer):
         outputs = model(inputs)
         
         if 'googlenet' in params.arch:
-            if params.evaluate == False:
+            if params.evaluate == False and params.dataset == 'imagenet':
                 finalOp = outputs[0]
                 auxOp2 = outputs[1]
                 auxOp1 = outputs[2]
@@ -70,7 +70,6 @@ class Trainer(trainingSrc.Trainer):
         model.train()
         
         for batch_idx, (inputs, targets) in tqdm(enumerate(train_loader), total=len(train_loader)-1, desc='epoch', leave=False): 
-            
             # move inputs and targets to GPU
             device = 'cuda:'+str(params.gpuList[0])
             if params.use_cuda: 
@@ -82,7 +81,7 @@ class Trainer(trainingSrc.Trainer):
             
             # train model
             loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets, params)
-            
+
             losses.update(loss) 
             top1.update(prec1) 
             top5.update(prec5)
@@ -97,7 +96,7 @@ class Trainer(trainingSrc.Trainer):
             losses = utils.AverageMeter()
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
-            
+
             self.batch_iter(model, criterion, optimiser, train_loader, params, losses, top1, top5)
 
             params.train_loss = losses.avg        

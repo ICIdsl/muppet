@@ -1,6 +1,7 @@
 import sys
 import math
 import torch
+import time
 
 class Policy(object):
     def __init__(self, params):
@@ -54,7 +55,7 @@ class Policy(object):
                 self.params.gdViolations += 1
         
         self.params.threshold = self.threshold[epoch]
-        
+
         tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
 
         if self.params.gdViolations >= self.params.policyPatience:

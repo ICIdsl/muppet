@@ -68,10 +68,11 @@ class ModelCreator(mcSrc.ModelCreator):
                 if params.depth == 18:
                     model = models.__dict__['resnet18'](pretrained=False, progress=False)
         elif 'googlenet' in params.arch:
-            if params.evaluate == False:
+            if params.evaluate == False and params.dataset == 'imagenet':
                 model = models.__dict__[params.arch](num_classes=num_classes, aux_logits=True)
             else:
                 model = models.__dict__[params.arch](num_classes=num_classes)
+            
         else:
             model = models.__dict__[params.arch](num_classes=num_classes)
 

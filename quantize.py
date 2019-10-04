@@ -3,6 +3,7 @@ import torch
 import copy
 import math
 import random as rand
+import time
 
 class Quantizer(object):
     def __init__(self, roundMeth):
@@ -48,6 +49,7 @@ class Quantizer(object):
         #  on they way down, dont want to underestimate
         sf = math.floor(math.log2(rangeBest))
         scaled.mul_(pow(2, sf))
+        
         return scaled, sf
 
     def stochRound(self, scaled, maxVal, minVal):
