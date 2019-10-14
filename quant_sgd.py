@@ -51,7 +51,7 @@ class QuantSGD(torch.optim.Optimizer):
                     continue
 
                 if params.dataType != 'Float':
-                    p.grad.data, _ = self.quantizer.quantize_inputs(p.grad.data, params.bitWidth)
+                    p.grad.data, _ = self.quantizer.quantize_inputs(p.grad.data, params.bitWidth, "optimizer-grad-{}".format(p.grad.data.shape))
                 
                 d_p = p.grad.data
                 
@@ -73,6 +73,6 @@ class QuantSGD(torch.optim.Optimizer):
                     p.data.add_(-group['lr'], d_p)
                 else:
                     fp.data.add_(-group['lr'], d_p)
-                    p.data, _ = self.quantizer.quantize_inputs(fp.data, params.bitWidth)
+                    p.data, _ = self.quantizer.quantize_inputs(fp.data, params.bitWidth, "optimizer-data-{}".format(p.data.shape))
             
         return loss

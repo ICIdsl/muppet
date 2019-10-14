@@ -325,7 +325,7 @@ class GoogLeNet(nn.Module):
         self.b5_b4_relu0 = nn.ReLU(True)
         
         self.avgpool = QuantAvgPool2d(8, stride=1)
-        self.linear = QuantLinear(1024, 10)
+        self.linear = QuantLinear(1024, num_classes)
 
     def forward(self, x):
         # pre_layers

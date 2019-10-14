@@ -37,7 +37,6 @@ class Params(ppSrc.Params):
         self.sumOfNorms = {}
         self.sumOfGrads = {}
         self.quantised = (self.bitWidth != 'Float')
-        self.sub_classes = []
         self.threshold = -1
 
         # self.gpuList = [int(x) for x in self.gpu_id.split(',')]

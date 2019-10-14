@@ -4,6 +4,7 @@ import sys
 import src.muppet.quantize as quantize
 
 
+__all__ = ['QuantConv2d', 'QuantLinear', 'QuantAvgPool2d', 'QuantAdaptiveAvgPool2d']
 class QuantConv2d(nn.Conv2d):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', _bitWidth=8, _SFHolder=None):
 
@@ -19,7 +20,7 @@ class QuantConv2d(nn.Conv2d):
 
     def forward(self, input):
         result = super().forward(input)
-        return forward(self, result)
+        return forward(self, result, "Conv2d")
 
 class QuantLinear(nn.Linear):
     def __init__(self, in_features, out_features, bias=True, _bitWidth=8, _SFHolder=None):
@@ -36,7 +37,7 @@ class QuantLinear(nn.Linear):
 
     def forward(self, input):
         result = super().forward(input)
-        return forward(self, result)
+        return forward(self, result, "Linear")
 
 class QuantAvgPool2d(nn.AvgPool2d):
     def __init__(self, kernel_size, stride=None, padding=0, ceil_mode=False, count_include_pad=True, _bitWidth=8, _SFHolder=None):
@@ -53,7 +54,7 @@ class QuantAvgPool2d(nn.AvgPool2d):
 
     def forward(self, input):
         result = super().forward(input)
-        return forward(self, result)
+        return forward(self, result, "AvgPool2d")
 
 class QuantAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
     def __init__(self, output_size, _bitWidth=8, _SFHolder=None):
@@ -70,11 +71,11 @@ class QuantAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
 
     def forward(self, input):
         result = super().forward(input)
-        return forward(self, result)
+        return forward(self, result, "AdaptiveAvgPool2d")
 
-def forward(self, result):
+def forward(self, result, spec):
     if self.bitWidth != -1:
-        result.data, sf = self.quantizer.quantize_inputs(result.data, self.bitWidth)
+        result.data, sf = self.quantizer.quantize_inputs(result.data, self.bitWidth, "forward-{}".format(spec))
     return result
 
 class SFHolder(object):

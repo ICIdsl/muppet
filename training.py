@@ -76,8 +76,9 @@ class Trainer(trainingSrc.Trainer):
                 inputs, targets = inputs.cuda(device, non_blocking=True), targets.cuda(device, non_blocking=True)
             
             if params.dataType != 'Float':
+                # print("Inputs")
                 for i in range(len(inputs)):
-                    inputs[i], _ = self.quantizer.quantize_inputs(inputs[i].data, params.bitWidth)
+                    inputs[i], _ = self.quantizer.quantize_inputs(inputs[i].data, params.bitWidth, "inputs")
             
             # train model
             loss, prec1, prec5 = self.train(model, criterion, optimiser, inputs, targets, params)

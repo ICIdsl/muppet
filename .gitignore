@@ -4,3 +4,7 @@ __pycache__
 runs/*
 legacy/*
 logs/*
+runtest.sh
+training_log.py
+graphing/*
+old_graphing/*
