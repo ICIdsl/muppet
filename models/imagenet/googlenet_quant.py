@@ -42,11 +42,11 @@ class InceptionAux(nn.Module):
 
     def __init__(self, in_channels, num_classes):
         super(InceptionAux, self).__init__()
-        self.conv = BasicConv2d(in_channels, 128, kernel_size=1)
-
-        self.fc1 = QuantLinear(2048, 1024)
-        self.fc2 = QuantLinear(1024, num_classes)
-        self.avgPool = QuantAdaptiveAvgPool2d((4,4))
+        
+        self.conv = AuxBasicConv2d(in_channels, 128, kernel_size=1)
+        self.fc1 = nn.Linear(2048, 1024)
+        self.fc2 = nn.Linear(1024, num_classes)
+        self.avgPool = nn.AdaptiveAvgPool2d((4,4))
 
     def forward(self, x):
         # aux1: N x 512 x 14 x 14, aux2: N x 528 x 14 x 14
@@ -65,6 +65,18 @@ class InceptionAux(nn.Module):
         # N x 1024
 
         return x
+
+class AuxBasicConv2d(nn.Module):
+
+    def __init__(self, in_channels, out_channels, **kwargs):
+        super(AuxBasicConv2d, self).__init__()
+        self.conv = nn.Conv2d(in_channels, out_channels, bias=False, **kwargs)
+        self.bn = nn.BatchNorm2d(out_channels, eps=0.001)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = self.bn(x)
+        return F.relu(x, inplace=True)
 
 class BasicConv2d(nn.Module):
 

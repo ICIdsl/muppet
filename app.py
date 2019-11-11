@@ -44,4 +44,4 @@ class Application(appSrc.Application):
     def run_training(self):
         # train model 
         print('==> Performing Training')
-        self.trainer.train_network(self.params, self.tbx_writer, self.checkpointer, self.train_loader, self.test_loader, self.valLoader, self.model, self.criterion, self.optimiser, self.inferer, self.policy, self.scaler)
+        self.trainer.train_network(self.params, None, self.checkpointer, self.train_loader, self.test_loader, self.valLoader, self.model, self.criterion, self.optimiser, self.inferer, self.policy, self.scaler)

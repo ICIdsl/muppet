@@ -8,3 +8,4 @@ runtest.sh
 training_log.py
 graphing/*
 old_graphing/*
+scripts/
