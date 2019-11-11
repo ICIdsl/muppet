@@ -107,7 +107,7 @@ class UniversalIterator(object):
 class Scaler(object):
     # def __init__(self, model, _quantizer, bitWidth):
     def __init__(self, model, _quantizer, params):
-        self.model = model
+    #{{{
         modules = model._modules
         self.layers = modules['module']._modules
         self.quantizer = _quantizer
@@ -126,7 +126,7 @@ class Scaler(object):
         #     v.sfHolder = None
         #     prevLayer = str(v)
 
-        for k,v in self.model.named_modules():
+        for k,v in model.named_modules():
             classes = tuple([ql.__dict__[x] for x in ql.__dict__['__all__']])
             if isinstance(v, classes):
                 v.setup_quantizer(self.quantizer)
@@ -135,11 +135,13 @@ class Scaler(object):
                 prevLayer = str(v)
         
         self.update_model_precision(model)
+    #}}}
     
     def update_model_precision(self, model):
-        layers = model._modules['module']._modules
-        for v in self.quantIterator(layers):
-            v.bitWidth = self.params.bitWidth
+        for k,v in model.named_modules():
+            classes = tuple([ql.__dict__[x] for x in ql.__dict__['__all__']])
+            if isinstance(v, classes):
+                v.bitWidth = self.params.bitWidth
 
     def register_hooks(self):
         for v in self.quantIterator(self.layers):

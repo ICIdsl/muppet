@@ -19,6 +19,7 @@ class Params(ppSrc.Params):
         self.policyResolution = config_file.getint('muppet_hyperparameters', 'policy_resolution')
         self.policyPatience = config_file.getint('muppet_hyperparameters', 'policy_patience')
         self.fp32EpochsPerLR = config_file.getint('muppet_hyperparameters', 'fp32_epochs_per_lr')
+        self.precEpochSchedule = config_file.get('muppet_hyperparameters', 'prec_epoch_schedule', fallback = 'undefined')
         
         self.precSchedule = config_file.get('muppet_hyperparameters', 'prec_schedule', fallback='undefined')
         if self.runMuppet:
@@ -27,6 +28,13 @@ class Params(ppSrc.Params):
             else:
                 self.precSchedule = [int(x) for x in self.precSchedule.split()]
                 assert self.precSchedule[0] == self.bitWidth, 'specified bitwidth ({}) and initial precision ({}) in prec schedule should match'.format(self.bitWidth, self.precSchedule[0])
+
+            if self.precEpochSchedule == 'undefined' or self.precEpochSchedule == '':
+                self.precEpochSchedule = [] 
+            else:
+                self.precEpochSchedule = [int(x) for x in self.precEpochSchedule.split()]
+                assert len(self.precEpochSchedule) == len(self.precSchedule)-1, 'Number of precision switching points ({}) does not match the number of precisions-1 ({})'.format(len(self.precEpochSchedule), len(self.precSchedule))
+                    
 
         if self.dataType == "Float":
             self.bitWidth = -1

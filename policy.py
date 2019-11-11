@@ -43,26 +43,32 @@ class Policy(object):
         self.params.sumOfGrads = {}
 
     def check_violation(self, epoch, tqdm, cp): 
-        if ((epoch+1) % self.params.policyResolution) != 0 or self.params.dataType == 'Float':
-            return False 
+        if self.params.precEpochSchedule == []:
+            if ((epoch+1) % self.params.policyResolution) != 0 or self.params.dataType == 'Float':
+                return False 
 
-        self.calculate_mean_gd()
-        
-        if self.params.meanGD >= self.params.maxGD:
-            self.params.maxGD = self.params.meanGD 
+            self.calculate_mean_gd()
+            
+            if self.params.meanGD >= self.params.maxGD:
+                self.params.maxGD = self.params.meanGD 
+            else:
+                if (self.params.maxGD / self.params.meanGD) > self.threshold[epoch]:
+                    self.params.gdViolations += 1
+            
+            self.params.threshold = self.threshold[epoch]
+
+            tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
+
+            if self.params.gdViolations >= self.params.policyPatience:
+                self.params.gdViolations = 0
+                return True
+            
+            return False
         else:
-            if (self.params.maxGD / self.params.meanGD) > self.threshold[epoch]:
-                self.params.gdViolations += 1
-        
-        self.params.threshold = self.threshold[epoch]
-
-        tqdm.write("meanGD = {}, maxGD = {}, ratio = {}, threshold = {}, gdViolations = {}".format(self.params.meanGD, self.params.maxGD, (self.params.maxGD / self.params.meanGD), self.threshold[epoch], self.params.gdViolations))
-
-        if self.params.gdViolations >= self.params.policyPatience:
-            self.params.gdViolations = 0
-            return True
-        
-        return False
+            if epoch in self.params.precEpochSchedule:
+                return True
+            else:
+                return False
     
     def copy_fp32_model(self, optimiser):
         for group in optimiser.param_groups:
@@ -72,6 +78,7 @@ class Policy(object):
                 weights[i].data = fpWeights[i].data
         
     def change_precision(self, scaler, model, optimiser):
+    #{{{
         self.precIndex += 1 
         self.params.bitWidth = self.params.precSchedule[self.precIndex]
         self.params.maxGD = 0
@@ -81,8 +88,10 @@ class Policy(object):
             self.copy_fp32_model(optimiser)
 
         scaler.update_model_precision(model)
+    #}}}
 
     def check_stopping_condition(self, optimiser):
+    #{{{
         if self.params.dataType == 'Float':
             if (self.fp32Count+1) % self.params.fp32EpochsPerLR == 0:
                 if self.params.lr > self.params.minLR:
@@ -96,9 +105,11 @@ class Policy(object):
             return False
         else:
             return False
+    #}}}
         
 
                 
+
                     
 
 
