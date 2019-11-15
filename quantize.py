@@ -16,7 +16,6 @@ class Quantizer(object):
             writer.writerow(line)
 
     def quantize_inputs(self, inputs, bitWidth, loc=None):
-        now = time.time()
         if isinstance(inputs, torch.Tensor): 
             tmp = inputs.clone()
         else: 
@@ -25,9 +24,6 @@ class Quantizer(object):
         scaleMat, scaleFac = self.scale(tmp, bitWidth)
         scaleMat.mul_(pow(2, -scaleFac))
         
-        if loc != None:
-            self.log(["Time-{}".format(loc), time.time() - now])
-
         return scaleMat, scaleFac
          
     def scale(self, scaled, bitWidth):
