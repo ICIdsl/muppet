@@ -9,3 +9,4 @@ training_log.py
 graphing/*
 old_graphing/*
 scripts/
+quant.csv
