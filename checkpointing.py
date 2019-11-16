@@ -67,3 +67,16 @@ class Checkpointer(cpSrc.Checkpointer):
             torch.save(params.get_state(), bestStatePath)
             torch.save(optimiser_dict['param_groups'][0]['fpWeights'], bestFp32Path)
     
+
+    def restore_state(self, params): 
+        res = super().restore_state(params)
+        if params.branch == True : 
+            file_to_load = params.pretrained.replace('model', 'state')        
+            device = 'cuda:' + str(params.gpuList[0])
+            prev_state_dict = torch.load(file_to_load, map_location=device)
+
+            res.maxGD = prev_state_dict['maxGD']
+            res.meanGD = prev_state_dict['meanGD']
+
+        return res
+
