@@ -73,6 +73,7 @@ class QuantAdaptiveAvgPool2d(nn.AdaptiveAvgPool2d):
         result = super().forward(input)
         return forward(self, result, "AdaptiveAvgPool2d")
 
+# modified forward that quantizes the result produced by the layer
 def forward(self, result, spec):
     if self.bitWidth != -1:
         result.data, sf = self.quantizer.quantize_inputs(result.data, self.bitWidth, "forward-{}".format(spec))

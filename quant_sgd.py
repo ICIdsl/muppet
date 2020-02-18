@@ -50,6 +50,7 @@ class QuantSGD(torch.optim.Optimizer):
                 if p.grad is None:
                     continue
 
+                # quantize the gradients
                 if params.dataType != 'Float':
                     p.grad.data, _ = self.quantizer.quantize_inputs(p.grad.data, params.bitWidth, "optimizer-grad-{}".format(p.grad.data.shape))
                 
@@ -69,6 +70,7 @@ class QuantSGD(torch.optim.Optimizer):
                     else:
                         d_p = buf
 
+                # if still in dynamic fixed point, quantize updated FP32 weights to target precision for upcoming forward pass
                 if params.dataType == 'Float':
                     p.data.add_(-group['lr'], d_p)
                 else:

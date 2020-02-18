@@ -3,65 +3,6 @@ import torch
 
 import src.muppet.quant_layers as ql
 
-# class QuantIterator(object):
-#     def __init__(self, layers):
-#         self.layersIterator = layers.items().__iter__()
-#     
-#     def __iter__(self):
-#         return self
-#     
-#     def __next__(self):
-#         k,v = next(self.layersIterator)
-#         while('Quant' not in str(v)):
-#             k,v = next(self.layersIterator)
-#         return v
-# 
-# class AlexnetIterator(QuantIterator):
-#     def __init__(self, layers):
-#         super().__init__(layers)
-# 
-#     def __iter__(self):
-#         return super().__iter__()
-# 
-#     def __next__(self):
-#         return super().__next__()
-# 
-# class GooglenetIterator(QuantIterator):
-#     def __init__(self, layers):
-#         super().__init__(layers)
-#         self.quantLayers = []
-#         self.index = 0 
-#     
-#     def __iter__(self):
-#         return super().__iter__()
-# 
-#     def __next__(self):
-#         if self.index == len(self.quantLayers):
-#             topEntity = super().__next__()
-#             self.quantLayers = []
-#             self.index = 0
-#             self.parse_description(topEntity)
-#             quantLayer = self.quantLayers[self.index]
-#             self.index += 1
-#         else:
-#             quantLayer = self.quantLayers[self.index]
-#             self.index += 1
-#         
-#         return quantLayer 
-#     
-#     def parse_description(self, v):
-#         name = v.__class__.__name__
-#         if name == 'QuantConv2d':
-#             self.quantLayers.append(v)
-#         elif name == 'QuantLinear':
-#             self.quantLayers.append(v)
-#         elif name == 'QuantAdaptiveAvgPool2d':
-#             self.quantLayers.append(v)
-#         else :
-#             for k,v in v._modules.items():
-#                 if 'Quant' in str(v):
-#                     self.parse_description(v)
-
 class UniversalIterator(object):
     def __init__(self, layers):
         self.layersIterator = layers.items().__iter__()

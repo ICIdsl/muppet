@@ -76,7 +76,6 @@ class Trainer(trainingSrc.Trainer):
                 inputs, targets = inputs.cuda(device, non_blocking=True), targets.cuda(device, non_blocking=True)
             
             if params.dataType != 'Float':
-                # print("Inputs")
                 for i in range(len(inputs)):
                     inputs[i], _ = self.quantizer.quantize_inputs(inputs[i].data, params.bitWidth, "inputs")
             
@@ -98,6 +97,7 @@ class Trainer(trainingSrc.Trainer):
             top1 = utils.AverageMeter()
             top5 = utils.AverageMeter()
 
+            # iterate over the batches in the epoch
             self.batch_iter(model, criterion, optimiser, train_loader, params, losses, top1, top5)
 
             params.train_loss = losses.avg        

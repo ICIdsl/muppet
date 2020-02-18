@@ -10,6 +10,7 @@ class Checkpointer(cpSrc.Checkpointer):
         
         self.headers += ['DataType', 'BitWidth']
 
+        # include additional headers relevant to MuPPET
         if params.runMuppet:
             self.headers += ['MeanGD', 'MaxGD', \
                              'Ratio', 'Threshold', 'GDViolations']

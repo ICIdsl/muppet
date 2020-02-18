@@ -23,6 +23,7 @@ class ModelCreator(mcSrc.ModelCreator):
         return torch.nn.CrossEntropyLoss()
 
     def setup_optimiser(self, params, model, quantizer):
+        # use quantized SGD optimizer to quantize the gradients and update the model appropriately
         opt = qsgd.QuantSGD(model.parameters(), quantizer, lr=params.lr, momentum=params.momentum, weight_decay=params.weight_decay)
 
         if params.resume == True or params.branch == True or params.evaluate == True:

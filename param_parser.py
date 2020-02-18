@@ -8,6 +8,7 @@ import src.param_parser as ppSrc
 
 class Params(ppSrc.Params): 
     def __init__(self, config_file) : 
+        # import generic configuration paramters 
         super().__init__(config_file)
         self.minLR = config_file.getfloat('training_hyperparameters', 'min_lr')
 
@@ -46,8 +47,6 @@ class Params(ppSrc.Params):
         self.sumOfGrads = {}
         self.quantised = (self.bitWidth != 'Float')
         self.threshold = -1
-
-        # self.gpuList = [int(x) for x in self.gpu_id.split(',')]
         
 def parse_command_line_args() : 
     parser = argparse.ArgumentParser(description='PyTorch Pruning')

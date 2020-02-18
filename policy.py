@@ -42,8 +42,10 @@ class Policy(object):
         self.params.sumOfNorms = {}
         self.params.sumOfGrads = {}
 
+    # check if policy has been violated
     def check_violation(self, epoch, tqdm, cp): 
         if self.params.precEpochSchedule == []:
+            # ensure that the resolution has been met, and if not there is no need to check the violation
             if ((epoch+1) % self.params.policyResolution) != 0 or self.params.dataType == 'Float':
                 return False 
 
@@ -83,6 +85,7 @@ class Policy(object):
         self.params.bitWidth = self.params.precSchedule[self.precIndex]
         self.params.maxGD = 0
 
+        # check to see if it is the final precision change to FP32
         if self.params.bitWidth == -1:
             self.params.dataType = 'Float'
             self.copy_fp32_model(optimiser)
@@ -93,7 +96,9 @@ class Policy(object):
     def check_stopping_condition(self, optimiser):
     #{{{
         if self.params.dataType == 'Float':
+            # check if the minimum number of FP32 epochs has passed
             if (self.fp32Count+1) % self.params.fp32EpochsPerLR == 0:
+                # check if the final LR has been passed yet
                 if self.params.lr > self.params.minLR:
                     for group in optimiser.param_groups: 
                         group['lr'] *= self.params.gamma 
@@ -106,19 +111,3 @@ class Policy(object):
         else:
             return False
     #}}}
-        
-
-                
-
-                    
-
-
-
-
-
-
-
-
-
-
-
