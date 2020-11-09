@@ -13,10 +13,15 @@ This is the open-sourced implementation of multi-precision training connected to
 ```
 Checkout https://www.imperial.ac.uk/intelligent-digital-systems to see other publications by the Intelligent Digital Systems Lab at Imperial College London.  
 
-To run this, clone https://github.com/ICIdsl/pytorch_training.git and run **git submodule update --init src/muppet**. 
+Installation
+------------
+```
+git clone https://github.com/ICIdsl/pytorch_training.git\
+cd pytorch_training\
+git submodule update --init src/muppet 
+```
 
 The following section defines MuPPET specific config file parameters. 
-
 config.ini
 ----------
 > MuPPET\_Hyperparameters
