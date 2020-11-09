@@ -16,8 +16,8 @@ Checkout https://www.imperial.ac.uk/intelligent-digital-systems to see other pub
 Installation
 ------------
 ```
-git clone https://github.com/ICIdsl/pytorch_training.git\
-cd pytorch_training\
+git clone https://github.com/ICIdsl/pytorch_training.git<br/>
+cd pytorch_training<br/>
 git submodule update --init src/muppet 
 ```
 
